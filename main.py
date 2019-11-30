@@ -56,7 +56,7 @@ while True:
 
 # 입력 동영상 총 프레임 수
 total_length    = int(vid.get(cv.CAP_PROP_FRAME_COUNT))
-fps             = int(vid.get(cv.CAP_PROP_FPS))
+fps             = vid.get(cv.CAP_PROP_FPS)
 
 # 프레임 뽑을 구간의 개수 정하기
 while True:
@@ -85,7 +85,7 @@ while True:
                 continue
             
             start_seconds   = int(start_time[0]) * 3600 + int(start_time[1]) * 60 + int(start_time[2])
-            start_frame     = fps * start_seconds
+            start_frame     = int(fps * start_seconds)
 
             if total_length < start_frame:
                 print("잘못된 시간인거 같은디")
@@ -99,7 +99,7 @@ while True:
                 continue
 
             end_seconds = int(end_time[0]) * 3600 + int(end_time[1]) * 60 + int(end_time[2])
-            end_frame   = fps * end_seconds
+            end_frame   = int(fps * end_seconds)
 
             if total_length < end_frame:
                 print("잘못된 시간인거 같은디")
