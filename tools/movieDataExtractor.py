@@ -3,6 +3,7 @@ import cv2 as cv
 import math
 import re
 import os
+import numpy as np
 
 # resize 크기
 width   = 480
@@ -46,7 +47,7 @@ while True:
 
     try:
         vid  = cv.VideoCapture(fileName)
-
+        vid.set(cv.CAP_PROP_FPS, 24)
         if not vid.isOpened(): raise NameError('동영상이 아니거나 파일이 없음')
 
     except cv.error     as e : print(e)
@@ -166,19 +167,27 @@ for index in range(101):
         break
 
 # 각 구간에서 뽑은 랜덤 프레임으로 이동하면서 연속된 샷의 프레임들을 뽑아서 저장
+prev_frame = np.zeros((height, width,3), np.float32)
 for frame_num in randFrame_list:
-
-    vid.set(cv.CAP_PROP_POS_FRAMES, frame_num)
-
     for shot in range(shot_length):
-
+        vid.set(cv.CAP_PROP_POS_FRAMES, frame_num + shot)
         flag, frame     = vid.read()
+
+        while True:
+            diff = (np.sum((frame - prev_frame)*(frame - prev_frame)) / (width*height*3))
+            if(diff > 100):
+                print(diff)
+                break
+            else:
+                flag, frame     = vid.read()
+        
         resized_frame   = cv.resize(frame, (width,height))
 
         cv.imshow(fileName, resized_frame)
-        cv.waitKey(30)
+        cv.waitKey(10)
         cv.imwrite(typeName + '_movie%d_%d.png'%(movie_num, file_num), resized_frame)
 
+        np.copyto(prev_frame, frame)
         file_num += 1
 
 vid.release()
