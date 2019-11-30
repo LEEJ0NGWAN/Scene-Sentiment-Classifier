@@ -68,82 +68,85 @@ while True:
 
     else: break
 
-# 각 구간의 시작, 끝 시간 입력
-for index in range(count):
-    while True:
-        
-        print("\n%d번째 구간"%index)
-
-        inputTime   = input("시작 시간 입력 (ex: 00:12:53) >>>")
-        start_time  = timeSplitter.findall(inputTime)
-
-        if not len(start_time) == 3:
-            print("제대로 입력하셈 hh:mm:ss 맞춰야함")
-            continue
-        
-        start_seconds   = int(start_time[0]) * 3600 + int(start_time[1]) * 60 + int(start_time[2])
-        start_frame     = fps * start_seconds
-
-        if total_length < start_frame:
-            print("잘못된 시간인거 같은디")
-            continue
-
-        inputTime   = input("끝 시간 입력 (ex: 00:12:53) >>>")
-        end_time    = timeSplitter.findall(inputTime)
-
-        if not len(end_time) == 3:
-            print("제대로 입력하셈 hh:mm:ss 맞춰야함")
-            continue
-
-        end_seconds = int(end_time[0]) * 3600 + int(end_time[1]) * 60 + int(end_time[2])
-        end_frame   = fps * end_seconds
-
-        if total_length < end_frame:
-            print("잘못된 시간인거 같은디")
-            continue
-
-        if start_frame >= end_frame:
-            print("왜 시작 시간이 더 뒤에 있음;;;")
-            continue
-
-        part_length = end_frame - start_frame
-
-        if part_length < extraction_size:
-            print("너무 짧음;;")
-            continue
-
-        # 구간의 시작,끝 프레임과 길이를 저장
-        tmp_list = []
-        tmp_list.append(start_frame)
-        tmp_list.append(end_frame)
-        tmp_list.append(part_length)
-        range_list.append(tmp_list)
-
-        break
-    
-    # 각 구간 당 몇 개 프레임 뽑을 지 랜덤 돌림
-    if not index == (count - 1):
-        randNum = rand(1,random_limit)
-        random_limit -= randNum
-        randSize_list.append(randNum)
-    
-    else:
-        randSize_list.append(random_limit)
-
-    # 각 구간 별 랜덤 프레임 뽑기 시작
-    tmp_list = []
-    for iteration in range(randSize_list[index]):
-
+while True:
+    accumulated_length = 0
+    range_list.clear()
+    # 각 구간의 시작, 끝 시간 입력
+    for index in range(count):
         while True:
-            randFrame = rand(range_list[index][0], range_list[index][1])
+            
+            print("\n%d번째 구간"%index)
 
-            if randFrame % 2 == 0       : continue
-            if randFrame not in tmp_list: break
+            inputTime   = input("시작 시간 입력 (ex: 00:12:53) >>>")
+            start_time  = timeSplitter.findall(inputTime)
 
-        tmp_list.append(randFrame)
+            if not len(start_time) == 3:
+                print("제대로 입력하셈 hh:mm:ss 맞춰야함")
+                continue
+            
+            start_seconds   = int(start_time[0]) * 3600 + int(start_time[1]) * 60 + int(start_time[2])
+            start_frame     = fps * start_seconds
 
-    randFrame_list.append(tmp_list)
-    randFrame_list[index].sort()
+            if total_length < start_frame:
+                print("잘못된 시간인거 같은디")
+                continue
+
+            inputTime   = input("끝 시간 입력 (ex: 00:12:53) >>>")
+            end_time    = timeSplitter.findall(inputTime)
+
+            if not len(end_time) == 3:
+                print("제대로 입력하셈 hh:mm:ss 맞춰야함")
+                continue
+
+            end_seconds = int(end_time[0]) * 3600 + int(end_time[1]) * 60 + int(end_time[2])
+            end_frame   = fps * end_seconds
+
+            if total_length < end_frame:
+                print("잘못된 시간인거 같은디")
+                continue
+
+            if start_frame >= end_frame:
+                print("왜 시작 시간이 더 뒤에 있음;;;")
+                continue
+
+            part_length = end_frame - start_frame
+            accumulated_length += part_length
+
+            # 구간의 시작,끝 프레임과 길이를 저장
+            tmp_list = []
+            tmp_list.append(start_frame)
+            tmp_list.append(end_frame)
+            tmp_list.append(part_length)
+            range_list.append(tmp_list)
+
+            break
+
+    if accumulated_length < extraction_size:    print("너무 짧음")
+    else:   break
+
+# 랜덤으로 프레임 뽑기
+for iteration in range(random_limit):
+
+    while True:
+        random_index = rand(0,count-1)
+        random_frame = rand(range_list[random_index][0], range_list[random_index][1])
+
+        if random_frame % shot_length != 0  : continue
+        if random_frame in randFrame_list   : continue
+
+        else:
+            randFrame_list.append(random_frame)
+            break
+
+# 랜덤 프레임 정렬 여부
+while True:
+    print("\n랜덤으로 뽑은 프레임 정렬할까요? y 또는 n 입력")
+    select = input("선택 (ex: y)>>>")
+    if select == "y":
+        randFrame_list.sort()
+        break
+    if select == "n":
+        break
 
 # 영화 장르 이름으로 폴더 생성
 try:
@@ -163,21 +166,20 @@ for index in range(101):
         break
 
 # 각 구간에서 뽑은 랜덤 프레임으로 이동하면서 연속된 샷의 프레임들을 뽑아서 저장
-for index in range(count):
-    for frame_num in randFrame_list[index]:
+for frame_num in randFrame_list:
 
-        vid.set(cv.CAP_PROP_POS_FRAMES, frame_num)
+    vid.set(cv.CAP_PROP_POS_FRAMES, frame_num)
 
-        for shot in range(shot_length):
+    for shot in range(shot_length):
 
-            flag, frame     = vid.read()
-            resized_frame   = cv.resize(frame, (width,height))
+        flag, frame     = vid.read()
+        resized_frame   = cv.resize(frame, (width,height))
 
-            cv.imshow(fileName, resized_frame)
-            cv.waitKey(30)
-            cv.imwrite(typeName + '_movie%d_%d.png'%(movie_num, file_num), resized_frame)
+        cv.imshow(fileName, resized_frame)
+        cv.waitKey(30)
+        cv.imwrite(typeName + '_movie%d_%d.png'%(movie_num, file_num), resized_frame)
 
-            file_num += 1
+        file_num += 1
 
 vid.release()
 cv.destroyAllWindows()
