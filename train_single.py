@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 import torchvision.models as models
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from torch.autograd import Variable
 
 from lib.data import MovieDataset, CATEGORY
 from lib.flownet import Flownet
@@ -16,9 +17,9 @@ if __name__ == '__main__':
     print('PyTorch 버전 : ' + torch.__version__)
     print('GPU 사용가능 여부 : ' + str(torch.cuda.is_available()))
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epoch', dest='epoch', type=int, default=20, help='epoch')
+    parser.add_argument('--epoch', dest='epoch', type=int, default=50, help='epoch')
     parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate')
-    parser.add_argument('--bs', dest='bs', type=int, default=32, help='batch size')
+    parser.add_argument('--bs', dest='bs', type=int, default=16, help='batch size')
     args = parser.parse_args()
     epoch = args.epoch
     lr = args.lr
@@ -38,19 +39,27 @@ if __name__ == '__main__':
     network = Flownet(CATEGORY)
 
     image_batch = torch.FloatTensor(1)
-    label_batch = torch.FloatTensor(1)
+    label_batch = torch.LongTensor(1)
 
     network.cuda()
     image_batch = image_batch.cuda()
     label_batch = label_batch.cuda()
+    image_batch = Variable(image_batch)
+    label_batch = Variable(label_batch)
 
+    optimizer = optim.SGD(network.parameters(), lr=lr)
     for i in range(epoch):
         print('epoch : ',i)
         network.train()
         for idx, item in enumerate(train_dataloader):
-            network.zero_grad()
-            with torch.no_grad():
-                image_batch.resize_(item[0].size()).copy_(item[0])
-                label_batch.resize_(item[1].size()).copy_(item[1])
+            image_batch.resize_(item[0].size()).copy_(item[0])
+            label_batch.resize_(item[1].size()).copy_(item[1])
+            optimizer.zero_grad()
             y = network(x=image_batch, t=label_batch)
-            print(str(bs * idx) + '/' + str(train_size))
+            #print(y.argmax(1))
+            criterion = nn.CrossEntropyLoss()
+            loss = criterion(y, label_batch)
+            loss.backward()
+            optimizer.step()
+            print('epoch {0} : {1}/{2} \t loss : {3}'. format(i, bs * idx, train_size, loss))
+        if((i+1)%5 == 0): torch.save(network, 'model_{0}.pkl'.format(i))

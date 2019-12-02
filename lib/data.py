@@ -43,6 +43,7 @@ def load_data(type):
             filename = os.path.join(path, file)
             train.append(filename)
             truth.append(i)
+        print('{0} in {1} data'.format(len(file_list), label))
 
     print('*** {0} {1} Path are loaded'.format(len(train), type))
     assert(len(train) == len(truth))
