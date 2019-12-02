@@ -32,17 +32,17 @@ class Flownet(nn.Module):
 
         fc_layers = []
         fc_layers.append(nn.Linear(1024*6*8, 4096))
-        fc_layers.append(nn.Dropout(0.5))
         fc_layers.append(nn.BatchNorm1d(4096))
         fc_layers.append(nn.ReLU())
+        fc_layers.append(nn.Dropout(0.5))
         fc_layers.append(nn.Linear(4096, 4096))
-        fc_layers.append(nn.Dropout(0.5))
         fc_layers.append(nn.BatchNorm1d(4096))
         fc_layers.append(nn.ReLU())
-        fc_layers.append(nn.Linear(4096, len(classes)))
         fc_layers.append(nn.Dropout(0.5))
+        fc_layers.append(nn.Linear(4096, len(classes)))
         fc_layers.append(nn.BatchNorm1d(len(classes)))
         fc_layers.append(nn.ReLU())
+        fc_layers.append(nn.Dropout(0.5))
         fc_layers.append(nn.Softmax())
         self.fc_layers = fc_layers
         self.fc = nn.Sequential(*fc_layers)

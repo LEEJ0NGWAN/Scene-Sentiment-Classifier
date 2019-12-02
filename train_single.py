@@ -12,6 +12,7 @@ from torch.autograd import Variable
 
 from lib.data import MovieDataset, CATEGORY
 from lib.flownet import Flownet
+from torch.utils.tensorboard import SummaryWriter
 
 if __name__ == '__main__':
     print('PyTorch 버전 : ' + torch.__version__)
@@ -28,8 +29,9 @@ if __name__ == '__main__':
     test_dataset = MovieDataset('test', (512,384))
     train_size = train_dataset.__len__()
     test_size = test_dataset.__len__()
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=bs, num_workers=4, shuffle=True)
-    iters_per_epoch = int(train_size / bs)
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=bs, num_workers=8, shuffle=True)
+    test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=bs, num_workers=4, shuffle=True)
+    writer = SummaryWriter()
 
     print('\n***** 학습정보 *****')
     print('EPOCH : ', (epoch))
@@ -48,6 +50,7 @@ if __name__ == '__main__':
     label_batch = Variable(label_batch)
 
     optimizer = optim.SGD(network.parameters(), lr=lr)
+    iter = 0
     for i in range(epoch):
         print('epoch : ',i)
         network.train()
@@ -59,7 +62,20 @@ if __name__ == '__main__':
             #print(y.argmax(1))
             criterion = nn.CrossEntropyLoss()
             loss = criterion(y, label_batch)
+            writer.add_scalar('Loss/Train', loss, iter)
             loss.backward()
             optimizer.step()
             print('epoch {0} : {1}/{2} \t loss : {3}'. format(i, bs * idx, train_size, loss))
-        if((i+1)%5 == 0): torch.save(network, 'model_{0}.pkl'.format(i))
+            iter = iter + 1
+
+            if(iter % 100 == 0):
+                for test_idx, test_item in enumerate(test_dataloader):
+                    with torch.no_grad():
+                        image_batch.resize_(item[0].size()).copy_(item[0])
+                        label_batch.resize_(item[1].size()).copy_(item[1])
+                        y = network(x=image_batch, t=label_batch)
+                        loss = criterion(y, label_batch)
+                        writer.add_scalar('Loss/Test', loss, iter)
+                    break
+
+        if(i%3 == 2): torch.save(network, 'model_{0}.pkl'.format(i))

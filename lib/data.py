@@ -21,12 +21,16 @@ class MovieDataset(Dataset):
             idx = idx.tolist()
 
         img_file = self.img[idx]
-        srcimg = cv2.imread(img_file)
-        if self.size != None:
-            srcimg = cv2.resize(srcimg, self.size)
-        image = torch.from_numpy(srcimg.astype('float32').transpose(2,0,1) / 255)
-        label = torch.from_numpy(np.array(self.label[idx]))
-        item = {image: image, label: label}
+        try:
+            srcimg = cv2.imread(img_file)
+            if self.size != None:
+                srcimg = cv2.resize(srcimg, self.size)
+            assert(srcimg.shape[0] > 10)
+            image = torch.from_numpy(srcimg.astype('float32').transpose(2,0,1) / 255)
+            label = torch.from_numpy(np.array(self.label[idx]))
+            item = {image: image, label: label}
+        except:
+            print('Error On : {0}'.format(img_file))
         return image, label
 
 
