@@ -65,7 +65,6 @@ if __name__ == '__main__':
             writer.add_scalar('Loss/Train', loss, iter)
             loss.backward()
             optimizer.step()
-            print('epoch {0} : {1}/{2} \t loss : {3}'. format(i, bs * idx, train_size, loss))
             iter = iter + 1
 
             if(iter % 100 == 0):
@@ -77,5 +76,6 @@ if __name__ == '__main__':
                         loss = criterion(y, label_batch)
                         writer.add_scalar('Loss/Test', loss, iter)
                     break
+        print('epoch {0} : {1}/{2} \t loss : {3}'. format(i, bs * idx, train_size, loss))
 
         if(i%3 == 2): torch.save(network, 'model_{0}.pkl'.format(i))
