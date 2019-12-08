@@ -38,7 +38,7 @@ if __name__ == '__main__':
     print('LEARNING_RATE : ', (lr))
     print('********************\n')
 
-    network = VGG11(CATEGORY)
+    network = VGG11(len(CATEGORY))
 
     image_batch = torch.FloatTensor(1)
     label_batch = torch.LongTensor(1)
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     image_batch = Variable(image_batch)
     label_batch = Variable(label_batch)
 
-    optimizer = optim.SGD(network.parameters(), lr=lr)
+    optimizer = optim.Adam(network.parameters(), lr=lr)
     iter = 0
     for i in range(epoch):
         print('epoch : ',i)

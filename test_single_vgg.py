@@ -23,7 +23,7 @@ if __name__ == '__main__':
     test_size = test_dataset.__len__()
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4, shuffle=True)
 
-    network = VGG11(CATEGORY)
+    network = VGG11(len(CATEGORY))
     network = torch.load('model_19.pkl')
 
     image_batch = torch.FloatTensor(1)
