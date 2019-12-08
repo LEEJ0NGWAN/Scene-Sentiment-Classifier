@@ -167,7 +167,7 @@ for index in range(101):
         break
 
 # 각 구간에서 뽑은 랜덤 프레임으로 이동하면서 연속된 샷의 프레임들을 뽑아서 저장
-prev_frame = np.zeros((546,1280,3), np.float32)
+prev_frame = np.zeros((800,1920,3), np.float32)
 for frame_num in randFrame_list:
     for shot in range(shot_length):
         vid.set(cv.CAP_PROP_POS_FRAMES, frame_num + shot)
