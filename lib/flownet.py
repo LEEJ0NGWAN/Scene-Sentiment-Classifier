@@ -71,8 +71,8 @@ class Flownet(nn.Module):
                 m.weight.data.normal_(mean, stddev)
                 m.bias.data.zero_()
         for layer in self.conv_layers:
-            normal_init(layer, 0, 0.1)
+            normal_init(layer, 0, 0.05)
             layer.requires_grad_(True)
         for layer in self.fc_layers:
-            normal_init(layer, 0, 0.1)
+            normal_init(layer, 0, 0.05)
             layer.requires_grad_(True)

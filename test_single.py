@@ -21,10 +21,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_dataset = MovieDataset('test', (512,384))
     test_size = test_dataset.__len__()
-    test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4, shuffle=True)
+    test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=8, shuffle=True)
 
     network = Flownet(CATEGORY)
-    network = torch.load('model_19.pkl')
+    #network = torch.load('model_79.pkl') #50.7
+    network = torch.load('model_59.pkl') #51.8
+    network = network.eval()
 
     image_batch = torch.FloatTensor(1)
     label_batch = torch.LongTensor(1)
@@ -43,6 +45,8 @@ if __name__ == '__main__':
         image_batch.resize_(item[0].size()).copy_(item[0])
         label_batch.resize_(item[1].size()).copy_(item[1])
         y = network(x=image_batch, t=label_batch)
+        print(y)
+        print(y.max())
         predict = torch.argmax(y, dim=1).detach().cpu().numpy()[0]
         truth = label_batch.detach().cpu().numpy()[0]
         is_correct = predict == truth
@@ -51,11 +55,19 @@ if __name__ == '__main__':
         if is_correct:
             acc[truth] = acc[truth] + 1
         visual = image_batch.detach().cpu().numpy()[0]
+        print(CATEGORY)
         print(acc)
         print(cnt)
         print(pop)
+        print(np.sum(acc) / np.sum(cnt))
         print()
 
-        cv2.imshow('v', visual.transpose(1,2,0))
+        visual = visual.transpose(1,2,0)
+        color = (255, 255, 255)
+        if predict != truth:
+            color = (0, 0, 255)
         print(CATEGORY[predict])
-        cv2.waitKey()
+        print('{0} ({1})'.format(CATEGORY[predict], CATEGORY[truth]))
+        visual = cv2.putText(visual, CATEGORY[predict], (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, color,4, cv2.LINE_AA)
+        cv2.imshow('output', visual)
+        if cv2.waitKey() == ord('q'): break

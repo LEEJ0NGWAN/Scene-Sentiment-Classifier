@@ -34,7 +34,7 @@ class MovieDataset(Dataset):
         return image, label
 
 
-def load_data(type):
+def load_data(type, d=1):
     train = []
     truth = []
 
@@ -52,7 +52,6 @@ def load_data(type):
     print('*** {0} {1} Path are loaded'.format(len(train), type))
     assert(len(train) == len(truth))
     return train, truth
-
 
 if __name__ == '__main__':
     load_data('train')

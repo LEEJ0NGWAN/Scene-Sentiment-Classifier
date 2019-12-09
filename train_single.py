@@ -18,13 +18,14 @@ if __name__ == '__main__':
     print('PyTorch 버전 : ' + torch.__version__)
     print('GPU 사용가능 여부 : ' + str(torch.cuda.is_available()))
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epoch', dest='epoch', type=int, default=50, help='epoch')
-    parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate')
+    parser.add_argument('--epoch', dest='epoch', type=int, default=60, help='epoch')
+    parser.add_argument('--lr', dest='lr', type=float, default=0.0001, help='learning rate')
     parser.add_argument('--bs', dest='bs', type=int, default=16, help='batch size')
     args = parser.parse_args()
     epoch = args.epoch
     lr = args.lr
     bs = args.bs
+    ckpt = 51
     train_dataset = MovieDataset('train', (512,384))
     test_dataset = MovieDataset('test', (512,384))
     train_size = train_dataset.__len__()
@@ -39,6 +40,8 @@ if __name__ == '__main__':
     print('********************\n')
 
     network = Flownet(CATEGORY)
+    if ckpt > 0:
+        network = torch.load('model_{0}.pkl'.format(ckpt))
 
     image_batch = torch.FloatTensor(1)
     label_batch = torch.LongTensor(1)
@@ -51,7 +54,7 @@ if __name__ == '__main__':
 
     optimizer = optim.SGD(network.parameters(), lr=lr)
     iter = 0
-    for i in range(epoch):
+    for i in range(ckpt, epoch):
         print('epoch : ',i)
         network.train()
         for idx, item in enumerate(train_dataloader):
@@ -59,7 +62,7 @@ if __name__ == '__main__':
             label_batch.resize_(item[1].size()).copy_(item[1])
             optimizer.zero_grad()
             y = network(x=image_batch, t=label_batch)
-            #print(y.argmax(1))
+            print(y.argmax(1))
             criterion = nn.CrossEntropyLoss()
             loss = criterion(y, label_batch)
             writer.add_scalar('Loss/Train', loss, iter)
@@ -71,11 +74,11 @@ if __name__ == '__main__':
             if(iter % 100 == 0):
                 for test_idx, test_item in enumerate(test_dataloader):
                     with torch.no_grad():
-                        image_batch.resize_(item[0].size()).copy_(item[0])
-                        label_batch.resize_(item[1].size()).copy_(item[1])
+                        image_batch.resize_(test_item[0].size()).copy_(test_item[0])
+                        label_batch.resize_(test_item[1].size()).copy_(test_item[1])
                         y = network(x=image_batch, t=label_batch)
                         loss = criterion(y, label_batch)
                         writer.add_scalar('Loss/Test', loss, iter)
                     break
-
-        if(i%3 == 2): torch.save(network, 'model_{0}.pkl'.format(i))
+        #lr = lr * 0.95
+        if((i+1)%4 == 0): torch.save(network, 'model_{0}.pkl'.format(i))
