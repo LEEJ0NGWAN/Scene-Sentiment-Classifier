@@ -25,8 +25,8 @@ if __name__ == '__main__':
     epoch = args.epoch
     lr = args.lr
     bs = args.bs
-    train_dataset = MovieDataset('train', (512,384))
-    test_dataset = MovieDataset('test', (512,384))
+    train_dataset = MovieDataset('train', (224,224))
+    test_dataset = MovieDataset('test', (224,224))
     train_size = train_dataset.__len__()
     test_size = test_dataset.__len__()
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=bs, num_workers=8, shuffle=True)

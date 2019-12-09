@@ -24,7 +24,7 @@ if __name__ == '__main__':
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4, shuffle=True)
 
     network = Flownet(CATEGORY)
-    network = torch.load('model_19.pkl')
+    network = torch.load('model_2.pkl')
 
     image_batch = torch.FloatTensor(1)
     label_batch = torch.LongTensor(1)
