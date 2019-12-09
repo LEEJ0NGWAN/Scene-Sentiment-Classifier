@@ -49,7 +49,7 @@ if __name__ == '__main__':
     image_batch = Variable(image_batch)
     label_batch = Variable(label_batch)
 
-    optimizer = optim.Adam(network.parameters(), lr=lr)
+    optimizer = optim.SGD(network.parameters(), lr=lr)
     iter = 0
     for i in range(epoch):
         print('epoch : ',i)
@@ -70,8 +70,8 @@ if __name__ == '__main__':
             if(iter % 100 == 0):
                 for test_idx, test_item in enumerate(test_dataloader):
                     with torch.no_grad():
-                        image_batch.resize_(item[0].size()).copy_(item[0])
-                        label_batch.resize_(item[1].size()).copy_(item[1])
+                        image_batch.resize_(test_item[0].size()).copy_(test_item[0])
+                        label_batch.resize_(test_item[1].size()).copy_(test_item[1])
                         y = network(x=image_batch, t=label_batch)
                         loss = criterion(y, label_batch)
                         writer.add_scalar('Loss/Test', loss, iter)
