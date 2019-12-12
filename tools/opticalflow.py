@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
- 
+
 frame1 = cv2.imread('action_movie7_15.png')
 frame2 = cv2.imread('action_movie7_16.png')
 
@@ -17,7 +17,7 @@ max_val = channel.max()
 col_motion = channel[:,:,0]
 row_motion = channel[:,:,1]
 # 여기서 정의된 col_motion과 row_motion 채널을 사용하기
-# 모션을 쌓아서 돌릴 때 R, G, B, ROW_MOTION, COL_MOTION 이렇게 하면 
+# 모션을 쌓아서 돌릴 때 R, G, B, ROW_MOTION, COL_MOTION 이렇게 하면
 # 아래는 볼 필요 없는 코드 (시각화)
 
 cv2.imshow('col motion',col_motion / max_val)
