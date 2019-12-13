@@ -58,6 +58,6 @@ if __name__ == '__main__':
         print(pop)
         print()
 
-        #cv2.imshow('v', visual.transpose(1,2,0))
+        cv2.imshow('v', visual.transpose(1,2,0))
         print(CATEGORY[predict])
         cv2.waitKey()
