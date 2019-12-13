@@ -20,6 +20,7 @@ class MovieDataset(Dataset):
         idx = idx * 2
         if torch.is_tensor(idx):
             idx = idx.tolist()
+
         img_file = self.img[idx]
         num = 0
         if img_file[-7:-4].isdecimal():
@@ -36,21 +37,18 @@ class MovieDataset(Dataset):
 
         try:
             srcimg = cv2.imread(img_file)
-            srcimg2 = cv2.imread(img_file2)
             if self.size != None:
                 srcimg = cv2.resize(srcimg, self.size)
-                srcimg2 = cv2.resize(srcimg2, self.size)
             assert(srcimg.shape[0] > 10)
-            assert(srcimg2.shape[0] > 10)
-            image = torch.from_numpy(np.vstack([srcimg.astype('float32').transpose(2,0,1) / 255,srcimg2.astype('float32').transpose(2,0,1) / 255]))
+            image = torch.from_numpy(srcimg.astype('float32').transpose(2,0,1) / 255)
             label = torch.from_numpy(np.array(self.label[idx]))
-            #item = {image: image, label: label}
+            item = {image: image, label: label}
         except:
             print('Error On : {0}'.format(img_file))
         return image, label
 
 
-def load_data(type, d=1):
+def load_data(type):
     train = []
     truth = []
 
@@ -68,6 +66,7 @@ def load_data(type, d=1):
     print('*** {0} {1} Path are loaded'.format(len(train), type))
     assert(len(train) == len(truth))
     return train, truth
+
 
 if __name__ == '__main__':
     load_data('train')
