@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epoch', dest='epoch', type=int, default=60, help='epoch')
     parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate')
-    parser.add_argument('--bs', dest='bs', type=int, default=32, help='batch size')
+    parser.add_argument('--bs', dest='bs', type=int, default=8, help='batch size')
     args = parser.parse_args()
     epoch = args.epoch
     lr = args.lr
