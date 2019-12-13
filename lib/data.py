@@ -14,9 +14,10 @@ class MovieDataset(Dataset):
         self.size = size
 
     def __len__(self):
-        return len(self.img)
+        return int(len(self.img)/2)
 
     def __getitem__(self, idx):
+        idx = idx * 2
         if torch.is_tensor(idx):
             idx = idx.tolist()
         img_file = self.img[idx]
@@ -32,10 +33,6 @@ class MovieDataset(Dataset):
         else:
             img_file = self.img[idx - 1]
             img_file2 = self.img[idx]
-
-        print(img_file)
-        print(img_file2)
-        print()
 
         try:
             srcimg = cv2.imread(img_file)
@@ -66,7 +63,7 @@ def load_data(type, d=1):
             filename = os.path.join(path, file)
             train.append(filename)
             truth.append(i)
-        print('{0} in {1} data'.format(len(file_list), label))
+        print('{0} in {1} images'.format(len(file_list), label))
 
     print('*** {0} {1} Path are loaded'.format(len(train), type))
     assert(len(train) == len(truth))

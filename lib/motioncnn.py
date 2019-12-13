@@ -33,7 +33,7 @@ class MotionNet(nn.Module):
         self.scene = nn.Sequential(*scene_layers)
 
         fc1_layers = []
-        fc1_layers.append(nn.Linear(1024*3*4, 4096))
+        fc1_layers.append(nn.Linear(1024*6*8, 4096))
         fc1_layers.append(nn.BatchNorm1d(4096))
         fc1_layers.append(nn.ReLU())
         fc1_layers.append(nn.Dropout(0.5))
@@ -62,7 +62,7 @@ class MotionNet(nn.Module):
         self.motion = nn.Sequential(*motion_layers)
 
         fc2_layers = []
-        fc2_layers.append(nn.Linear(1024*3*4, 1024))
+        fc2_layers.append(nn.Linear(1024*6*8, 1024))
         fc2_layers.append(nn.BatchNorm1d(1024))
         fc2_layers.append(nn.ReLU())
         fc2_layers.append(nn.Dropout(0.5))
@@ -117,6 +117,7 @@ class MotionNet(nn.Module):
             channel = flow.reshape((height, width, 2))
             channel = channel.transpose(2,0,1)
             flow_arr[i] = channel
+            '''
             # Visualizing Training
             mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
             hsv = np.zeros_like(prev_color)
@@ -128,7 +129,7 @@ class MotionNet(nn.Module):
             cv2.imshow('next_color',next_color)
             cv2.imshow('visualized',rgb)
             cv2.waitKey()
-
+            '''
 
         conv_y1 = self.scene(x1)
         flatten_y1 = conv_y1.view(batch_size, -1)

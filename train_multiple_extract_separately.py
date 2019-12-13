@@ -26,8 +26,8 @@ if __name__ == '__main__':
     lr = args.lr
     bs = args.bs
     ckpt = 0
-    train_dataset = MovieDataset('train', (256,192))
-    test_dataset = MovieDataset('test', (256,192))
+    train_dataset = MovieDataset('train', (512,384))
+    test_dataset = MovieDataset('test', (512,384))
     train_size = train_dataset.__len__()
     test_size = test_dataset.__len__()
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=bs, num_workers=8, shuffle=True)
