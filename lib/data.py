@@ -20,7 +20,14 @@ class MovieDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         img_file = self.img[idx]
-        if(int(img_file[-7:-4])%2 == 1):
+        num = 0
+        if img_file[-7:-4].isdecimal():
+            num = int(img_file[-7:-4])
+        elif img_file[-6:-4].isdecimal():
+            num = int(img_file[-6:-4])
+        else:
+            num = int(img_file[-5])
+        if (num % 2) == 1:
             img_file2 = self.img[idx + 1]
         else:
             img_file = self.img[idx - 1]
