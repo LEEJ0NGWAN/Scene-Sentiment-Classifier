@@ -24,6 +24,11 @@ class MovieDataset(Dataset):
             img_file2 = self.img[idx-1]
         else:
             img_file2 = self.img[idx+1]
+
+        print(img_file)
+        print(img_file2)
+        print()
+        
         try:
             srcimg = cv2.imread(img_file)
             srcimg2 = cv2.imread(img_file2)
