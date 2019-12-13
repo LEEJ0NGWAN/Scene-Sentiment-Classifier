@@ -20,15 +20,16 @@ class MovieDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         img_file = self.img[idx]
-        if(idx%2 == 1):
-            img_file2 = self.img[idx-1]
+        if(int(img_file[-7:-4])%2 == 1):
+            img_file2 = self.img[idx + 1]
         else:
-            img_file2 = self.img[idx+1]
+            img_file = self.img[idx - 1]
+            img_file2 = self.img[idx]
 
         print(img_file)
         print(img_file2)
         print()
-        
+
         try:
             srcimg = cv2.imread(img_file)
             srcimg2 = cv2.imread(img_file2)
