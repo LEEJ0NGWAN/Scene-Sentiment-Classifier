@@ -36,13 +36,30 @@ class MovieDataset(Dataset):
             img_file2 = self.img[idx]
 
         try:
+            ##########################################
             srcimg = cv2.imread(img_file)
+            srcimg2 = cv2.imread(img_file2)
             if self.size != None:
                 srcimg = cv2.resize(srcimg, self.size)
-            assert(srcimg.shape[0] > 10)
-            image = torch.from_numpy(srcimg.astype('float32').transpose(2,0,1) / 255)
+                srcimg2 = cv2.resize(srcimg2, self.size)
+            assert (srcimg.shape[0] > 10)
+            assert (srcimg2.shape[0] > 10)
+            image = torch.from_numpy(
+            np.vstack([srcimg.astype('float32').transpose(2, 0, 1) / 255, srcimg2.astype('float32').transpose(2, 0, 1) / 255]))
+            # image = torch.from_numpy(srcimg.astype('float32').transpose(2, 0, 1) / 255)
             label = torch.from_numpy(np.array(self.label[idx]))
+            # item = {image: image, label: label}
             item = {image: image, label: label}
+            ##########################################
+
+
+            # srcimg = cv2.imread(img_file)
+            # if self.size != None:
+            #     srcimg = cv2.resize(srcimg, self.size)
+            # assert(srcimg.shape[0] > 10)
+            # image = torch.from_numpy(srcimg.astype('float32').transpose(2,0,1) / 255)
+            # label = torch.from_numpy(np.array(self.label[idx]))
+            # item = {image: image, label: label}
         except:
             print('Error On : {0}'.format(img_file))
         return image, label
