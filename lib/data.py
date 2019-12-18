@@ -35,6 +35,7 @@ class MovieDataset(Dataset):
             img_file2 = self.img[idx]
 
         try:
+            ##########################################
             srcimg = cv2.imread(img_file)
             srcimg2 = cv2.imread(img_file2)
             if self.size != None:
