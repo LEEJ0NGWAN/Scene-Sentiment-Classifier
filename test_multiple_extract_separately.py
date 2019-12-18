@@ -12,7 +12,7 @@ from torch.autograd import Variable
 import cv2
 
 from lib.data import MovieDataset, CATEGORY
-from lib.flownet import Flownet
+from lib.moception3 import Moception
 
 if __name__ == '__main__':
     print('PyTorch 버전 : ' + torch.__version__)
@@ -23,8 +23,8 @@ if __name__ == '__main__':
     test_size = test_dataset.__len__()
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=8, shuffle=True)
 
-    network = Flownet(CATEGORY)
-    network = torch.load('model_39.pkl')
+    network = Moception(len(CATEGORY))
+    network = torch.load('model_sep_39.pkl')
     network = network.eval()
 
     image_batch1 = torch.FloatTensor(1)
@@ -55,9 +55,9 @@ if __name__ == '__main__':
         w = item_size[3]
         image_batch1.resize_((_bs,cs,h,w)).copy_(item[0][:,0:3])
         image_batch2.resize_((_bs,cs,h,w)).copy_(item[0][:,3:6])
-        motion_batch.resize_((_bs,2,h,w))
+        motion_batch.resize_((_bs,1))
         label_batch.resize_(item[1].size()).copy_(item[1])
-        y = network(x1=image_batch1, x2=image_batch2, motion_batch=motion_batch, t=label_batch)
+        y = network(x1=image_batch1, x2=image_batch2, motion_batch=motion_batch)
         print(y)
         print(y.max())
         predict = torch.argmax(y, dim=1).detach().cpu().numpy()[0]
@@ -83,4 +83,4 @@ if __name__ == '__main__':
         print('{0} ({1})'.format(CATEGORY[predict], CATEGORY[truth]))
         visual = cv2.putText(visual, CATEGORY[predict], (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, color,4, cv2.LINE_AA)
         cv2.imshow('output', visual)
-        if cv2.waitKey() == ord('q'): break
+        if cv2.waitKey(1) == ord('q'): break

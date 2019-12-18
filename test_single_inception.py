@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from torch.autograd import Variable
 import cv2
 
-from lib.data import MovieDataset, CATEGORY
+from lib.data_single import MovieDataset, CATEGORY
 from lib.inception3 import Inception3
 
 if __name__ == '__main__':
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4, shuffle=True)
 
     network = Inception3(len(CATEGORY), aux_logits = False)
-    network = torch.load('model_29.pkl')
+    network = torch.load('model_39.pkl')
 
     image_batch = torch.FloatTensor(1)
     label_batch = torch.LongTensor(1)

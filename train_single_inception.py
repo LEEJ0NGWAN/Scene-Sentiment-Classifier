@@ -10,7 +10,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.autograd import Variable
 
-from lib.data import MovieDataset, CATEGORY
+from lib.data_single import MovieDataset, CATEGORY
 from lib.inception3 import Inception3
 from torch.utils.tensorboard import SummaryWriter
 
@@ -19,8 +19,8 @@ if __name__ == '__main__':
     print('GPU 사용가능 여부 : ' + str(torch.cuda.is_available()))
     parser = argparse.ArgumentParser()
     parser.add_argument('--epoch', dest='epoch', type=int, default=50, help='epoch')
-    parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate')
-    parser.add_argument('--bs', dest='bs', type=int, default=16, help='batch size')
+    parser.add_argument('--lr', dest='lr', type=float, default=0.0001, help='learning rate')
+    parser.add_argument('--bs', dest='bs', type=int, default=32, help='batch size')
     args = parser.parse_args()
     epoch = args.epoch
     lr = args.lr
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             writer.add_scalar('Loss/Train', loss, iter)
             loss.backward()
             optimizer.step()
-            
+
             iter = iter + 1
 
             if(iter % 100 == 0):
