@@ -103,6 +103,7 @@ class Moception(nn.Module):
         self.Mixed_7b = inception_e(1280)
         self.Mixed_7c = inception_e(2048)
         self.fc = nn.Linear(2048 + 1, num_classes)
+        self.motion_fc = nn.Linear(1,1)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
@@ -233,6 +234,7 @@ class Moception(nn.Module):
         x1, aux = self._forward(x1) # 2048
         x2 = motion_batch
         x2 = self._transform_motion_input(x2)
+        x2 = self.motion_fc(x2)
         x = torch.cat([x1, x2], 1) # 2048+1
         x = self.fc(x) # 2049 -> classnum
 
@@ -243,7 +245,6 @@ class Moception(nn.Module):
             return InceptionOutputs(x, aux)
         else:
             return self.eager_outputs(x, aux)
-
 
 class InceptionA(nn.Module):
 
