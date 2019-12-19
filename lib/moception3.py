@@ -106,7 +106,9 @@ class Moception(nn.Module):
         self.fc = nn.Linear(2048, num_classes)
         self.fc2 = nn.Linear(num_classes, 1)
         self.motion_fc = nn.Linear(1,1)
-        self.fc3 = nn.Linear(2,num_classes)
+        self.fc3 = nn.Linear(2,256)
+        self.fc4 = nn.Linear(256,256)
+        self.fc5 = nn.Linear(256,num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
@@ -236,7 +238,8 @@ class Moception(nn.Module):
         x1 = self._transform_input(x1)
         x1, aux = self._forward(x1) # 2048
         x2 = motion_batch
-        x2 = self._transform_motion_input(x2)
+        # x2 = self._transform_motion_input(x2)
+        x2 = x2 / 4000
         x2 = self.motion_fc(x2)
         x2 = F.relu(x2, inplace=True)
         # x = torch.cat([x1, x2], 1) # 2048+1
@@ -245,7 +248,15 @@ class Moception(nn.Module):
         x1 = self.fc2(x1) # classnum -> 1
         x1 = F.relu(x1, inplace=True)
         x = torch.cat([x1, x2],1)
-        x = self.fc3(x) # 2 -> 1
+        #x = self.fc3(x) # 2 -> 6
+        #x = F.relu(x, inplace=True)
+        x = self.fc3(x) # 2 -> 256
+        x = F.relu(x, inplace=True)
+        x = self.fc4(x) # 256 -> 256
+        x = F.relu(x, inplace=True)
+        x = self.fc4(x) # 256 -> 256
+        x = F.relu(x, inplace=True)
+        x = self.fc5(x) # 256 -> 6
         x = F.relu(x, inplace=True)
         aux_defined = False #self.training and self.aux_logits
         if torch.jit.is_scripting():
