@@ -104,7 +104,9 @@ class Moception(nn.Module):
         self.Mixed_7c = inception_e(2048)        
         # self.fc = nn.Linear(2048 + 1, num_classes)
         self.fc = nn.Linear(2048, num_classes)
+        self.fc2 = nn.Linear(num_classes, 1)
         self.motion_fc = nn.Linear(1,1)
+        self.fc3 = nn.Linear(2,num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
@@ -236,9 +238,15 @@ class Moception(nn.Module):
         x2 = motion_batch
         x2 = self._transform_motion_input(x2)
         x2 = self.motion_fc(x2)
+        x2 = F.relu(x2, inplace=True)
         # x = torch.cat([x1, x2], 1) # 2048+1
-        x = self.fc(x1) # 2049 -> classnum
-
+        x1 = self.fc(x1) # 2049 -> classnum
+        x1 = F.relu(x1, inplace=True)
+        x1 = self.fc2(x1) # classnum -> 1
+        x1 = F.relu(x1, inplace=True)
+        x = torch.cat([x1, x2],1)
+        x = self.fc3(x) # 2 -> 1
+        x = F.relu(x, inplace=True)
         aux_defined = False #self.training and self.aux_logits
         if torch.jit.is_scripting():
             if not aux_defined:
